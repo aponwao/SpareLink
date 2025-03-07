@@ -1,0 +1,26 @@
+app = "server-sparelink"
+primary_region = "fra"
+swap_size_mb = 4096
+
+[build]
+  builder = "heroku/builder:24"
+
+[env]
+  HOST = "0.0.0.0"
+  PORT = 9000
+  NODE_ENV = "production"
+
+[http_service]
+auto_start_machines = true
+auto_stop_machines = true
+force_https = true
+internal_port = 9000
+min_machines_running = 1
+
+ [http_service.concurrency]
+  soft_limit = 20
+  hard_limit = 25
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    grace_period = "1s"

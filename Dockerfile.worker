@@ -1,0 +1,37 @@
+# Use an official Node runtime as a parent image
+FROM node:20-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+RUN corepack enable && \
+    npm install -g @medusajs/medusa-cli
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy the rest of your Medusa application's source code
+COPY . .
+
+# Build the Medusa application
+RUN npx medusa build --admin-only && \
+    npx medusa build
+
+WORKDIR /app/.medusa/server
+
+# RUN yarn install && cd ../../ && cp .env.production /app/.medusa/server/env.production
+RUN yarn run install
+
+WORKDIR /app
+
+# Expose the port Medusa runs on
+EXPOSE 9000
+
+# Set environment variable
+ENV NODE_ENV=production
+
+# Run the Medusa server
+CMD ["npx", "medusa", "start", "-H", "0.0.0.0", "-p", "9000"]
